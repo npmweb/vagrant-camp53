@@ -35,7 +35,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vb.customize ["modifyvm", :id, "--cpus", "1"]
       vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
       vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-      vb.name = "php53-dev"
+      vb.name = "php53-local"
     end
 
 
@@ -79,60 +79,33 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision :shell, path: "scripts/bootstrap.sh"
 
-  # do apache sites
-
-  npmstaff = {
-    "domain" => 'local.npmstaff.org',
-    "docroot" => '/srv/www/local.npmstaff.org/web',
-    "alias" => '/account',
-    "alias_to" => '/srv/www/local.npmstaff.org/account',
+  # configure apache vhosts here
+  localhost = {
+    "domain" => 'local.php53',
+    "docroot" => '/srv/www/localhost',
+    "alias" => '/test',
+    "alias_to" => '/srv/apps/test',
     "phperr" => 'E_ALL'
   }
-  killinit = {
-    "domain" => 'local.killinitseries.org',
-    "docroot" => '/srv/apps/series-sites',
-    "phperr" => 'E_ALL'
-  }
-  middleware = {
-    "domain" => 'local.api.northpointministries.net',
-    "docroot" => '/srv/apps/api.northpointministries.net/api.northpointministries.net/src',
-    "alias" => '/media',
-    "alias_to" => '/srv/apps/media-api'
-  }
 
-  sites = [ npmstaff, killinit, middleware ]
+  sites = [ localhost ]
   sites.each do |site|
-    # Remove Previously Configured Apache Sites
-    config.vm.provision "shell" do |s|
-      s.inline = "rm -fv /etc/httpd/vhosts.d/$1.conf 2> /dev/null"
-    end
     config.vm.provision "shell" do |s|
       s.inline = "bash /vagrant/scripts/vhosts.sh $1 $2 \"$3\" \"$4\" \"$5\""
       s.args = [site["domain"], site["docroot"], site["alias"] ||= "", site["alias_to"] ||= "", site["phperr"] ||= ""]
     end
+    config.vm.provision "shell" do |s|
+      s.inline = "sudo service httpd restart"
+    end
   end
 
-  mma = {
-    "database" => 'ci_mma',
-    "username" => 'ci_mma',
-    "password" => 'ci_mma',
-  }
-  middleware = {
-    "database" => 'ci_api',
-    "username" => 'ci_api',
-    "password" => 'mP3Lnd66PtGb9QXX',
-  }
-  ondeck = {
-    "database" => 'ci_ondeck',
-    "username" => 'ondeck_user',
+  # configure databases here
+  test = {
+    "database" => 'test',
+    "username" => 'test',
     "password" => 'test',
   }
-  cfs = {
-    "database" => 'ci_cfs',
-    "username" => 'ci_cfs',
-    "password" => 'ci_cfs',
-  }
-  dbs = [ mma, middleware, ondeck, cfs ]
+  dbs = [ test ]
   dbs.each do |db|
     config.vm.provision "shell" do |s|
       s.inline = "bash /vagrant/scripts/mysql.sh $1 $2 $3"
