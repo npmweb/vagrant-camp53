@@ -95,9 +95,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       s.inline = "bash /vagrant/scripts/vhosts.sh $1 $2 \"$3\" \"$4\" \"$5\""
       s.args = [site["domain"], site["docroot"], site["alias"] ||= "", site["alias_to"] ||= "", site["phperr"] ||= ""]
     end
-    config.vm.provision "shell" do |s|
-      s.inline = "sudo service httpd restart"
-    end
+  end
+
+  #bounce apache
+  config.vm.provision "shell" do |s|
+    s.inline = "sudo service httpd restart"
   end
 
   # configure databases here
