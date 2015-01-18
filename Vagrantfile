@@ -50,17 +50,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # If true, then any SSH connections made will enable agent forwarding.
   # Default value: false
-  # config.ssh.forward_agent = true
-  config.ssh.insert_key = true
+  #config.ssh.insert_key = true
+  config.ssh.forward_agent = true
+  config.ssh.private_key_path = ["#{ENV['HOME']}/.ssh/id_rsa", \
+    "#{ENV['HOME']}/.vagrant.d/insecure_private_key"]
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
-  config.vm.synced_folder "~/apps", "/srv/apps",
-            :mount_options => ['fmode=777,dmode=777']
-  config.vm.synced_folder "~/www", "/srv/www",
-            :mount_options => ["fmode=777,dmode=777"]
+  config.vm.synced_folder "~/apps", "/srv/apps", type: "nfs"
+  #          :mount_options => ['fmode=777,dmode=777']
+  config.vm.synced_folder "~/www", "/srv/www", type: "nfs"
+  #          :mount_options => ["fmode=777,dmode=777"]
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
