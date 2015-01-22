@@ -14,6 +14,7 @@ yum install -y npm beanstalkd
 #yum install -y --enablerepo=remi php55 php55-php-common php55-php-cli php55-php-gd php55-php-mbstring php55-php-opcache php55-php-xml php55-php-mcrypt
 
 # gotta install composer
+npm install -g bower gulp grunt-cli
 
 chkconfig --add mysqld
 chkconfig mysqld on
