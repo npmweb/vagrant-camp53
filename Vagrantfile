@@ -35,7 +35,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vb.customize ["modifyvm", :id, "--cpus", "1"]
       vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
       vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-      vb.name = "php53-local"
+      vb.name = "php53-local-git-1"
     end
 
 
@@ -50,8 +50,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # If true, then any SSH connections made will enable agent forwarding.
   # Default value: false
-  # config.ssh.forward_agent = true
-  config.ssh.insert_key = true
+  #config.ssh.insert_key = true
+  #config.ssh.forward_agent = true
+  config.ssh.private_key_path = ["#{ENV['HOME']}/.ssh/id_rsa", \
+    "#{ENV['HOME']}/.vagrant.d/insecure_private_key"]
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
@@ -79,6 +81,34 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 
   config.vm.provision :shell, path: "scripts/bootstrap.sh"
+
+  # ssh key setup
+  main_key = {
+    "privateKey" => '~/.ssh/id_rsa',
+    "publicKey" => '~/.ssh/id_rsa.pub'
+  }
+  key_pairs = [ main_key ]
+
+  ssh_config = "~/.ssh/config"
+
+  # Configure Keys For SSH Access
+  config.vm.provision "shell" do |s|
+    s.privileged = false
+    s.inline = "echo \"$1\" > /home/vagrant/.ssh/config && chmod 600 /home/vagrant/.ssh/config"
+    s.args = [File.read(File.expand_path(ssh_config))]
+  end
+
+#  key_pairs.each do |ssh_key|
+#    config.vm.provision "shell" do |s|
+#      s.inline = "echo $2 | tee -a /home/vagrant/.ssh/authorized_keys"
+#      s.args = [File.read(File.expand_path(ssh_key["publicKey"]))]
+#    end
+#    config.vm.provision "shell" do |s|
+#      s.privileged = false
+#      s.inline = "echo \"$1\" > /home/vagrant/.ssh/$2 && chmod 600 /home/vagrant/.ssh/$2"
+#      s.args = [File.read(File.expand_path(ssh_key["privateKey"])), ssh_key["privateKey"].split('/').last]
+#    end
+#  end
 
   # configure apache vhosts here
   localhost = {
