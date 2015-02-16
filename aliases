@@ -1,0 +1,22 @@
+
+alias ..="cd .."
+alias ...="cd ../.."
+
+alias h='cd ~'
+alias c='clear'
+
+alias art='php artisan'
+alias admp='php artisan dump'
+alias phpunit='vendor/bin/phpunit'
+
+alias gs='git st '
+alias ga='git a '
+alias gb='git br '
+alias gc='git ci'
+alias gd='git diff'
+alias go='git checkout '
+alias gk='gitk --all&'
+alias gx='gitx --all'
+
+alias got='git '
+alias get='git '

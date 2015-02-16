@@ -1,0 +1,37 @@
+---
+ip: "192.168.10.11"
+memory: 1920
+cpus: 1
+boxname: "php53-local"
+
+config: ~/.ssh/config
+
+authorize: ~/.ssh/id_rsa.pub
+
+keys:
+    - ~/.ssh/id_rsa
+
+folders:
+    - map: ~/apps
+      to: /srv/apps
+      options: ["fmode=777,dmode=777"]
+    - map: ~/www
+      to: /srv/www
+      options: ["fmode=777,dmode=777"]
+
+sites:
+    - map: local.box
+      to: /srv/www/localhost
+      phperr: E_ALL
+      aliases:
+        - name: /test
+          to: /srv/apps/myapp/endpoints/test
+        - name: /test2
+          to: /srv/apps/myapp/endpoints/test2
+
+dbs:
+    - database: l_myapp
+      username: l_myapp
+      password: l_myapp
+
+
